@@ -1,0 +1,69 @@
+---
+BasedOnStyle: Microsoft
+
+AccessModifierOffset: -2
+# Alignment
+PointerAlignment: Right
+AlignAfterOpenBracket: Align
+AlignOperands: Align
+AlignTrailingComments: true
+AlignConsecutiveMacros: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignEscapedNewlines: Right
+AllowAllArgumentsOnNextLine: false
+AllowAllConstructorInitializersOnNextLine: true
+AlwaysBreakAfterDefinitionReturnType: TopLevel
+AlwaysBreakAfterReturnType: TopLevel
+AlwaysBreakBeforeMultilineStrings: false
+# Bin pack 
+BinPackArguments: true
+BinPackParameters: false
+ExperimentalAutoDetectBinPacking: false
+# Penalty settings
+PenaltyBreakAssignment: 20
+PenaltyBreakOpenParenthesis: 100
+PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakComment: 10
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyExcessCharacter: 1000000
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: true
+BraceWrapping:
+  AfterClass:      true
+  AfterControlStatement: true
+  AfterEnum:       false
+  AfterExternBlock: false
+  AfterFunction:   true
+  AfterNamespace:  true
+  AfterObjCDeclaration: false
+  AfterStruct:     true
+  AfterUnion:      true
+  BeforeCatch:     true
+  BeforeElse:      true
+  IndentBraces:    false
+  SplitEmptyFunction: true
+  SplitEmptyNamespace: true
+  SplitEmptyRecord: false
+BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeColon
+BreakStringLiterals: true
+ColumnLimit: 80
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+FixNamespaceComments: true #(not supported yet)
+IncludeBlocks: Preserve
+IndentCaseLabels: true
+IndentWidth: 4
+SortIncludes: true
+Standard: Cpp11
+
+...
