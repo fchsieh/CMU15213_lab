@@ -135,26 +135,28 @@ NOTES:
 
 #endif
 //1
-/* 
- * bitXor - x^y using only ~ and & 
+/*
+ * bitXor - x^y using only ~ and &
  *   Example: bitXor(4, 5) = 1
  *   Legal ops: ~ &
  *   Max ops: 14
  *   Rating: 1
  */
-int bitXor(int x, int y) {
+int bitXor(int x, int y)
+{
     // (~(~x & y)) = (x | y)
     // (~(x & y)) = (~x | ~y)
     // => x ^ y = (x | y) & (~x | ~y)
-    return (~(~x & ~y)) & (~(x & y)) ;
+    return (~(~x & ~y)) & (~(x & y));
 }
-/* 
- * tmin - return minimum two's complement integer 
+/*
+ * tmin - return minimum two's complement integer
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 4
  *   Rating: 1
  */
-int tmin(void) {
+int tmin(void)
+{
     return (1 << 31);
 }
 //2
@@ -166,7 +168,17 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-    return 0;
+    /*
+     * (~x) ^ (x+1) is 0 if x is either Tmax or -1 (0xffffffff).
+     * We would need this one to check if x is Tmax.
+     * But first, we need to block out the edge case (-1):
+     * (x ^ (~0)) is 0 only if x is -1, we can check if this is non-zero (!!)
+     * Then combine together (using bit &), we get the answer.
+     */
+    int isNotNegativeOne    = (!!(x ^ (~0)));
+    int isTmaxOrNegativeOne = (!((~x) ^ (x + 1)));
+
+    return isNotNegativeOne & isTmaxOrNegativeOne;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -177,7 +189,9 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+    int allOdds = ((0xAA << 24) | (0xAA << 16) | (0xAA << 8) | (0xAA));
+    // mask all odd bits of x, and check if the mask result is = allOdds
+    return !((x & allOdds) ^ allOdds);
 }
 /* 
  * negate - return -x 
@@ -187,7 +201,10 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    int isNegate = !(x & (1 << 31));
+    //    printf("isNegate %s\n", isNegate ? "TRUE" : "FALSE");
+    // return (1 << 31) | (~x);
+    return 1;
 }
 //3
 /* 
