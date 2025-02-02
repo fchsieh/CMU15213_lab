@@ -201,10 +201,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-    int isNegate = !(x & (1 << 31));
-    //    printf("isNegate %s\n", isNegate ? "TRUE" : "FALSE");
-    // return (1 << 31) | (~x);
-    return 1;
+    return ((~x) + 0x1);
 }
 //3
 /* 
@@ -216,8 +213,11 @@ int negate(int x) {
  *   Max ops: 15
  *   Rating: 3
  */
-int isAsciiDigit(int x) {
-  return 2;
+int isAsciiDigit(int x)
+{
+    int GEQ_30 = !((x + (~0x30) + 1) >> 31);  //  >= 30
+    int LT_3a  = !!((x + (~0x3a) + 1) >> 31); // < 3a (<= 39)
+    return (GEQ_30 & LT_3a);
 }
 /* 
  * conditional - same as x ? y : z 
@@ -227,7 +227,12 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+    int xIsTrue = !!x;
+    // xIsTrue    -> 0x1 -> ~(0x1) + 1 = 0xffffffff
+    // (!xIsTrue) -> 0x0 -> ~(0x0) + 1 = 0x0
+    int retY = (~xIsTrue + 1) & y;
+    int retZ = (~(!xIsTrue) + 1) & z;
+    return retY | retZ;
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -237,7 +242,11 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    int diffSign          = !(x >> 31) ^ !(y >> 31);
+    int X_LEQ_Y           = !((y + (~x) + 1) >> 31);
+    int diffSign_X_is_Neg = (diffSign & (x >> 31));
+    int sameSign_X_LEQ_Y  = ((~diffSign) & (X_LEQ_Y));
+    return diffSign_X_is_Neg | sameSign_X_LEQ_Y;
 }
 //4
 /* 
