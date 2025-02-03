@@ -258,7 +258,14 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+    // compress until last bit, and check if it is 0x1 (means that at least 1 bit in x)
+    int comp_16 = (x >> 16) | x;
+    int comp_8  = (comp_16 >> 8) | comp_16;
+    int comp_4  = (comp_8 >> 4) | comp_8;
+    int comp_2  = (comp_4 >> 2) | comp_4;
+    int comp_1  = (comp_2 >> 1) | comp_2;
+
+    return (comp_1 ^ 0x1) & 0x1; // inverse: 0x1 -> 0x0, 0x0 -> 0x1 (neg)
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -272,8 +279,35 @@ int logicalNeg(int x) {
  *  Max ops: 90
  *  Rating: 4
  */
-int howManyBits(int x) {
-  return 0;
+int howManyBits(int x)
+{
+    int sign = x >> 31;
+    int bit16, bit8, bit4, bit2, bit1, bit0;
+
+    // find ans of negative number X is the same as finding inverse X
+    x = (sign & ~x) | (~sign & x);
+
+    // check if x is > 2^16, then move to right half (ex: 10100000 => xxxx1010)
+    // if so, we add N by 16
+    bit16 = (!!(x >> 16)) << 4;
+    x >>= bit16;
+    // check if x is > 2^8
+    bit8 = !!(x >> 8) << 3;
+    x >>= bit8;
+    // check if x is > 2^4
+    bit4 = !!(x >> 4) << 2;
+    x >>= bit4;
+    // check if x is > 2^2
+    bit2 = !!(x >> 2) << 1;
+    x >>= bit2;
+    // check if x is > 2^1
+    bit1 = !!(x >> 1) << 0;
+    x >>= bit1;
+    // last bit
+    bit0 = x;
+
+    // we need N+1 to represent
+    return bit16 + bit8 + bit4 + bit2 + bit1 + bit0 + 1;
 }
 //float
 /* 
