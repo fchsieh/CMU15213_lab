@@ -322,7 +322,20 @@ int howManyBits(int x)
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+    unsigned isNaN = (uf == 0x7f800000);
+
+    unsigned SIGN     = (uf & 0x80000000);
+    unsigned EXP      = (uf & 0x7f800000);
+    unsigned FRACTION = (uf & 0x007fffff);
+
+    if (EXP == 0)
+        FRACTION <<= 1;
+    else if (EXP != 0x7f800000) // if EXP is not 0xFF, then add EXP by 1
+        EXP += 0x00800000;
+
+    if (isNaN)
+        return uf;
+    return SIGN | EXP | FRACTION;
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -337,7 +350,34 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+    int f          = uf;
+    int SIGN       = !!(f >> 31);
+    int EXP        = (f >> 23) & 0xff;
+    int FRAC       = (f & 0x007fffff);
+    int OutOfRange = 0x80000000u;
+
+    if (EXP == 0xff) // NaN and INF
+        return OutOfRange;
+    if (EXP < 127) // will be 0.xxxx
+        return 0;
+
+    EXP = EXP - 127;
+    if (EXP >= 31) // overflow
+        return OutOfRange;
+
+    // 2^(exp) * (sum(i->23)b_{23-i}2^{-i})
+    if (EXP >= 23) // this means that we need to multiply fraction by x (exp-23)
+        FRAC <<= (EXP - 23);
+    else // this means that we need to divide fraction by x (x = 23-exp)
+        FRAC >>= (23 - EXP);
+
+    // add back 1 (in the part of '1' + sum(i->23)b_{23-i}2^{-i})
+    FRAC += (1 << EXP);
+
+    if (SIGN)
+        FRAC = -FRAC;
+
+    return FRAC;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -352,6 +392,27 @@ int floatFloat2Int(unsigned uf) {
  *   Max ops: 30 
  *   Rating: 4
  */
-unsigned floatPower2(int x) {
-    return 2;
+unsigned floatPower2(int x)
+{
+    unsigned INF = 0x7f800000;
+    unsigned EXP;
+
+    if (x >= 0)
+    {
+        EXP = (x + 0x7f);
+        if (EXP > 0xff)
+            return INF;
+        return (EXP << 23);
+    }
+    else
+    {
+        if (x < -149)
+            return 0;
+        if (x < -126) // using only the fraction part (-127 ~ -149)
+            return (1 << (23 - (-x - 126)));
+        // using only the EXP part (E - 127 = x)
+        return ((x + 0x7f) & 0xff) << 23;
+    }
+
+    return 0;
 }
